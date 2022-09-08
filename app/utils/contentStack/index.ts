@@ -1,9 +1,10 @@
 import contentstack from 'contentstack';
-import ContentstackLivePreview from '@contentstack/live-preview-utils';
 
-import type { GetEntry, ContentStackENV } from '~/models/contentStack';
+import getEntry from './getEntry';
 
-const setContentStack = (ENV: ContentStackENV) => {
+import type { CSENV } from '~/env.server';
+
+const setContentStack = async (ENV: CSENV, url: string) => {
 	const Stack = contentstack.Stack({
 		api_key: ENV.CS_API_KEY,
 		delivery_token: ENV.CS_DELIVERY_TOKEN,
@@ -15,44 +16,22 @@ const setContentStack = (ENV: ContentStackENV) => {
 		}
 	});
 
-	Stack.setHost(ENV.CS_API_HOST);
+	const { searchParams } = new URL(url);
 
-	// ContentstackLivePreview.init({
-	// 	stackDetails: {
-	// 		apiKey: ENV.CS_API_KEY
-	// 	},
-	// 	enable: true,
-	// 	ssr: true
-	// });
-
-	const getEntry = ({ contentTypeUid, jsonRtePath, referenceFieldPath }: GetEntry) => {
-		return new Promise((resolve) => {
-			const query = Stack.ContentType(contentTypeUid).Query();
-
-			if (referenceFieldPath) query.includeReference(referenceFieldPath);
-
-			query
-				.includeOwner()
-				.toJSON()
-				.find()
-				.then((res) => {
-					jsonRtePath &&
-						contentstack.Utils.jsonToHTML({
-							entry: res,
-							paths: jsonRtePath
-						});
-
-					resolve(res);
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		});
+	const lpQuery = {
+		live_preview: searchParams.get('live_preview') as string,
+		content_type_uid: searchParams.get('content_type_uid') as string
 	};
 
-	// const { onEntryChange } = ContentstackLivePreview;
+	Stack.livePreviewQuery(lpQuery);
+	Stack.setHost(ENV.CS_API_HOST);
 
-	return { Stack, getEntry };
+	const entry = await getEntry({
+		contentTypeUid: lpQuery.content_type_uid || 'item',
+		stack: Stack
+	});
+
+	return { entry: entry[0][0], contentTypeUid: lpQuery.content_type_uid };
 };
 
 export default setContentStack;

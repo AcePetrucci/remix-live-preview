@@ -1,67 +1,75 @@
-import type { MetaFunction, LinksFunction, LoaderFunction} from "@remix-run/node";
+import type { MetaFunction, LinksFunction, LoaderFunction } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData
-} from "@remix-run/react";
+	Links,
+	LiveReload,
+	Meta,
+	Outlet,
+	Scripts,
+	ScrollRestoration,
+	useLoaderData
+} from '@remix-run/react';
 
-import type { ContentStackENV } from './models/contentStack';
+import type { PublicENV } from './env.server';
+import { getCSENV, getPublicENV } from './env.server';
+import setContentStack from './utils/contentStack';
 
-import styles from './styles/app.css';
+import type { EmbeddedItem } from './utils/contentStack/getEntry';
+import LivePreviewContext from './store/livePreviewContext';
 
-import setContentStack from "./utils/contentStack";
+import tailwindStyles from './styles/app.css';
+import contentStackStyles from "@contentstack/live-preview-utils/dist/main.css";
+
+type LoaderData = {
+	ENV: PublicENV;
+	entry: EmbeddedItem;
+  contentTypeUid: string;
+};
 
 export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "New Remix App",
-  viewport: "width=device-width,initial-scale=1",
+	charset: 'utf-8',
+	title: 'New Remix App',
+	viewport: 'width=device-width,initial-scale=1'
 });
 
-export const links: LinksFunction = () => ([
-  { rel: "stylesheet", href: styles }
-])
+export const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: tailwindStyles },
+  { rel: 'stylesheet', href: contentStackStyles }
+];
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const ENV: ContentStackENV = {
-    CS_API_KEY: process.env.CS_API_KEY as string,
-    CS_MANAGEMENT_TOKEN: process.env.CS_MANAGEMENT_TOKEN as string,
-    CS_DELIVERY_TOKEN: process.env.CS_DELIVERY_TOKEN as string,
-    CS_ENV: process.env.CS_ENV as string,
-    CS_API_HOST: process.env.CS_API_HOST as string,
-  };
+	const CSENV = getCSENV();
+	const PublicENV = getPublicENV();
 
-  const { Stack, getEntry } = setContentStack(ENV);
+	const { entry, contentTypeUid } = await setContentStack(CSENV, request.url);
 
-  const itemCombined = await getEntry({
-    contentTypeUid: 'item',
-    jsonRtePath: undefined,
-    referenceFieldPath: undefined
-  });
-
-  return itemCombined;
-}
+	return json<LoaderData>({
+		ENV: PublicENV,
+		entry: entry,
+    contentTypeUid
+	});
+};
 
 export default function App() {
-  const data = useLoaderData();
+	const { entry, contentTypeUid, ENV } = useLoaderData() as LoaderData;
 
-  console.log(data);
+	return (
+		<html lang="en">
+			<head>
+				<Meta />
+				<Links />
+			</head>
+			<body>
+        <LivePreviewContext.Provider value={{entry, contentTypeUid}}>
+				  <Outlet />
+        </LivePreviewContext.Provider>
+				<ScrollRestoration />
 
-  return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  );
+				<script dangerouslySetInnerHTML={{ __html: `window.ENV = ${JSON.stringify(ENV)}` }} />
+
+				<Scripts />
+				<LiveReload />
+			</body>
+		</html>
+	);
 }
