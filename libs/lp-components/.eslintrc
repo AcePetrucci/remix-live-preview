@@ -1,0 +1,14 @@
+{
+	"extends": [
+		"airbnb",
+		"airbnb-typescript",
+		"airbnb/hooks",
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:prettier/recommended",
+		"plugin:storybook/recommended"
+	],
+	"plugins": ["react", "prettier", "react-hooks", "@typescript-eslint"]
+}
