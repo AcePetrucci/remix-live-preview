@@ -2,13 +2,9 @@ import type { EntryContext } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { renderToString } from "react-dom/server";
 
-import { getPublicENV, getCSENV } from "./utils/server/env.server";
-import { setContentStack } from "./utils/server/contentStack.server";
+import { getCSENV } from "./utils/server/env.server";
 
-const { Stack } = setContentStack(getCSENV());
-
-global.ENV = getPublicENV();
-global.Stack = Stack;
+global.ENV = getCSENV();
 
 export default function handleRequest(
   request: Request,

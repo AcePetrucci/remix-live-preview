@@ -10,11 +10,10 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 
-import type { PublicENV } from "./utils/server/env.server";
-import { getPublicENV } from "./utils/server/env.server";
+import type { CSENV } from "./utils/server/env.server";
+import { getCSENV } from "./utils/server/env.server";
 
-import type { EmbeddedItem } from "./utils/contentStack/getEntry";
-import { livePreviewQuery } from "./utils/contentStack";
+import { useLivePreview } from "./hooks/useLivePreview";
 
 import Welcome from "./components/Welcome";
 import Tabs from "./components/Tabs";
@@ -24,9 +23,7 @@ import Tabs from "./components/Tabs";
  */
 
 type LoaderData = {
-  ENV: PublicENV;
-  entry: EmbeddedItem;
-  contentTypeUid: string;
+  ENV: CSENV;
 };
 
 /**
@@ -40,14 +37,10 @@ export const meta: MetaFunction = () => ({
 });
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const publicENV = getPublicENV();
-
-  const { entry, contentTypeUid } = await livePreviewQuery(request.url);
+  const ENV = getCSENV();
 
   return json<LoaderData>({
-    ENV: publicENV,
-    entry,
-    contentTypeUid,
+    ENV,
   });
 };
 
@@ -56,7 +49,8 @@ export const loader: LoaderFunction = async ({ request }) => {
  */
 
 export default function App() {
-  const { entry, contentTypeUid, ENV } = useLoaderData() as LoaderData;
+  const { ENV } = useLoaderData() as LoaderData;
+  const { entry } = useLivePreview("item", ENV);
 
   return (
     <html lang="en">
@@ -67,9 +61,7 @@ export default function App() {
       <body>
         <Welcome entry={entry} />
         <Tabs />
-        <Outlet context={{ entry, contentTypeUid }} />
-
-        {entry?.title}
+        <Outlet context={{ entry }} />
 
         <ScrollRestoration />
 
