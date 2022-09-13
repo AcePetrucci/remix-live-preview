@@ -4,13 +4,6 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", "build/**"]
-    },
-    "lint": {
-      "outputs": []
-    },
-    "deploy": {
-      "dependsOn": ["build", "lint"],
-      "outputs": []
     }
   }
 }

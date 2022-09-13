@@ -9,6 +9,7 @@
     "dev:app": "nx dev live-preview",
     "build:app": "nx build live-preview",
     "build": "turbo run build",
+    "build:deploy": "turbo run build --filter=live-preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
