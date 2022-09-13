@@ -8,12 +8,14 @@
     "build:lib": "nx build lp-components",
     "dev:app": "nx dev live-preview",
     "build:app": "nx build live-preview",
+    "build": "turbo run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nx": "^14.6.4"
+    "nx": "^14.6.4",
+    "turbo": "^1.4.6"
   }
 }
