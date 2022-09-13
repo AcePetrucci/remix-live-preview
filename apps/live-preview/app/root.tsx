@@ -1,5 +1,5 @@
-import type { MetaFunction, LinksFunction, LoaderFunction } from '@remix-run/node';
-import { json } from '@remix-run/node';
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,23 +7,21 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData
-} from '@remix-run/react';
-import { addEditableTags } from '@contentstack/utils';
+  useLoaderData,
+} from "@remix-run/react";
 
-import type { PublicENV } from './env.server';
-import { getCSENV, getPublicENV } from './env.server';
-import setContentStack from './utils/contentStack';
+import type { PublicENV } from "./utils/server/env.server";
+import { getPublicENV } from "./utils/server/env.server";
 
-import type { EmbeddedItem } from './utils/contentStack/getEntry';
-import LivePreviewContext from './store/livePreviewContext';
+import type { EmbeddedItem } from "./utils/contentStack/getEntry";
+import { livePreviewQuery } from "./utils/contentStack";
 
-import tailwindStyles from './styles/app.css';
-import contentStackStyles from '@contentstack/live-preview-utils/dist/main.css';
-import lpComponentsStyles from 'lp-components/dist/style.css';
+import Welcome from "./components/Welcome";
+import Tabs from "./components/Tabs";
 
-import Welcome from './components/Welcome';
-import Tabs from './components/Tabs';
+/**
+ * Loader Type Definition
+ */
 
 type LoaderData = {
   ENV: PublicENV;
@@ -31,35 +29,34 @@ type LoaderData = {
   contentTypeUid: string;
 };
 
+/**
+ * Root Server Functions
+ */
+
 export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  title: 'New Remix App',
-  viewport: 'width=device-width,initial-scale=1'
+  charset: "utf-8",
+  title: "New Remix App",
+  viewport: "width=device-width,initial-scale=1",
 });
 
-export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: tailwindStyles },
-  { rel: 'stylesheet', href: contentStackStyles },
-  { rel: 'stylesheet', href: lpComponentsStyles }
-];
-
 export const loader: LoaderFunction = async ({ request }) => {
-  const CSENV = getCSENV();
-  const PublicENV = getPublicENV();
+  const publicENV = getPublicENV();
 
-  const { entry, contentTypeUid } = await setContentStack(CSENV, request.url);
+  const { entry, contentTypeUid } = await livePreviewQuery(request.url);
 
   return json<LoaderData>({
-    ENV: PublicENV,
-    entry: entry,
-    contentTypeUid
+    ENV: publicENV,
+    entry,
+    contentTypeUid,
   });
 };
 
+/**
+ * Root Render
+ */
+
 export default function App() {
   const { entry, contentTypeUid, ENV } = useLoaderData() as LoaderData;
-
-  addEditableTags(entry, contentTypeUid, true);
 
   return (
     <html lang="en">
@@ -67,21 +64,22 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="w-full font-sans text-blue-900 bg-gray-50">
-        <LivePreviewContext.Provider value={{ entry, contentTypeUid }}>
-          <section className="p-12 xl:p-8 lg:p-6">
-            <Welcome entry={entry} />
-            <Tabs entry={entry} />
+      <body>
+        <Welcome entry={entry} />
+        <Tabs />
+        <Outlet context={{ entry, contentTypeUid }} />
 
-            <Outlet />
-          </section>
-        </LivePreviewContext.Provider>
+        {entry?.title}
 
         <ScrollRestoration />
 
-        <script dangerouslySetInnerHTML={{ __html: `window.ENV = ${JSON.stringify(ENV)}` }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(ENV)}`,
+          }}
+        />
         <Scripts />
-        <LiveReload />
+        <LiveReload port={8002} />
       </body>
     </html>
   );
