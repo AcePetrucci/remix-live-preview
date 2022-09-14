@@ -5,9 +5,9 @@ import { userEvent, waitFor, within } from '@storybook/testing-library';
 import truefalseMock from './_mock';
 import TrueFalseProps from '../types/props';
 
-type TChoiceStoryTest = StoryContext<ReactFramework, TrueFalseProps>;
+type TTrueFalseStoryTest = StoryContext<ReactFramework, TrueFalseProps>;
 
-const TrueFalseStoryTest = async ({ canvasElement }: TChoiceStoryTest) => {
+const TrueFalseStoryTest = async ({ canvasElement }: TTrueFalseStoryTest) => {
   const canvas = within(canvasElement);
 
   userEvent.click(canvas.getByTestId(`TF-true-${truefalseMock.id}`));

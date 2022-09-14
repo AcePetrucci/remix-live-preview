@@ -5,10 +5,12 @@ import { TrueOrFalse } from 'lp-components';
 export default function TrueOrFalsePreview() {
   const { entry } = useLivePreviewContext();
 
+  console.log(entry);
+
   return (
     <>
       <h1 className="flex justify-center mb-6 text-3xl font-semibold tracking-wide">
-        True or False Entry
+        True or False
       </h1>
 
       <h3
