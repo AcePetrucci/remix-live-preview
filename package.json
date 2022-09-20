@@ -5,12 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev:lib": "nx dev lp-components",
-    "build:lib": "nx build lp-components",
     "dev:app": "nx dev live-preview",
+    "build:lib": "nx build lp-components",
     "build:app": "nx build live-preview",
-    "build": "turbo run build",
-    "build:deploy": "turbo run build --filter=live-preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy:lib": "turbo run build",
+    "deploy:app": "turbo run build --filter=live-preview"
   },
   "keywords": [],
   "author": "",
