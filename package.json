@@ -8,7 +8,7 @@
     "dev:app": "nx dev live-preview",
     "build:lib": "nx build lp-components",
     "build:app": "nx build live-preview",
-    "deploy:lib": "turbo run build",
+    "deploy:lib": "turbo run build --filter=lp-components",
     "deploy:app": "turbo run build --filter=live-preview"
   },
   "keywords": [],
