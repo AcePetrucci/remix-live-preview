@@ -1,38 +1,33 @@
-import { motion } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 
 import { TextBlock } from '~/components/Basic/TextBlock';
 
 import { WordProps } from './types/props';
 
-import { useDragging } from './hooks/useDragging';
-
 export const Word = ({
   id,
-  layoutId,
-  onDrag,
   onDragEnd,
-  onDragStart,
   children,
   className,
   style
 }: WordProps) => {
-  const { dragging, handleDragEnd, handleDragStart } = useDragging({
-    onDragStart,
-    onDragEnd
-  });
+  const translateY = useMotionValue(0);
 
   return (
     <motion.div
-      id={id}
-      className="h-fit"
-      style={{ pointerEvents: dragging ? 'none' : 'initial' }}
+      style={{ y: translateY }}
       drag
       dragMomentum={false}
       dragSnapToOrigin={true}
-      onDrag={() => onDrag && onDrag()}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      layoutId={layoutId}
+      layoutId={`word-${id}`}
+      onDragEnd={({ target }) => {
+        const offTop = (target as HTMLElement).offsetTop;
+        const wordHeight = (target as HTMLElement).offsetHeight;
+
+        const wordPosition = offTop + wordHeight + translateY.get();
+
+        onDragEnd && onDragEnd(wordPosition < 0);
+      }}
     >
       <TextBlock className={className} style={style}>
         {children}

@@ -1,12 +1,9 @@
 import { CSSProperties, ReactNode } from 'react';
 
-export type OrderWordsProps<T = any[]> = {
+export type OrderWordsProps = {
   children: ReactNode;
-  values: T;
-  axis?: 'x' | 'y';
-  onReorder: (newOrder: T) => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
+  values: any[];
+  onReorder: (newOrder: any[]) => void;
   className?: string;
   style?: CSSProperties;
 };

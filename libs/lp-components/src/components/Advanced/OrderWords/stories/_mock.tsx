@@ -12,51 +12,8 @@ export const oneOrderWordsMock: OrderWordsProps = {
   onReorder: (newOrder: any[]) => {}
 };
 
-export const multipleOrderWordsMock: OrderWordsProps<string[]> = {
+export const multipleOrderWordsMock: OrderWordsProps = {
   children: '',
-  values: ['Fox', 'Quick', 'The', 'Brown'],
-  onReorder: (newOrder: any[]) => {}
-};
-
-type TWordsValues = {
-  value: string;
-  dragged: boolean;
-  dragging: boolean;
-  outsideBox: boolean;
-  insideOrder: boolean;
-};
-
-export const boxOrderWordsMock: OrderWordsProps<TWordsValues[]> = {
-  children: '',
-  values: [
-    {
-      value: 'Fox',
-      dragged: false,
-      dragging: false,
-      outsideBox: false,
-      insideOrder: false
-    },
-    {
-      value: 'Quick',
-      dragged: false,
-      dragging: false,
-      outsideBox: false,
-      insideOrder: false
-    },
-    {
-      value: 'The',
-      dragged: false,
-      dragging: false,
-      outsideBox: false,
-      insideOrder: false
-    },
-    {
-      value: 'Brown',
-      dragged: false,
-      dragging: false,
-      outsideBox: false,
-      insideOrder: false
-    }
-  ],
+  values: ['Fox', 'Brown', 'The', 'Quick'],
   onReorder: (newOrder: any[]) => {}
 };
