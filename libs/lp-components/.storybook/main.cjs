@@ -17,14 +17,11 @@ module.exports = {
     interactionsDebugger: true
   },
   async viteFinal(config, { configType }) {
-    const { config: userConfig } = await loadConfigFromFile(
-      configType,
-      path.resolve(__dirname, '../vite.config.ts')
-    );
-
     return mergeConfig(config, {
-      ...userConfig,
-      plugins: []
+      plugins: [],
+      resolve: {
+        alias: [{ find: '~', replacement: path.resolve(__dirname, '../src') }]
+      }
     });
   }
 };
